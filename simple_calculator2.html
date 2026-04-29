@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DOM in JAVASCRIPT</title>
+    <style>
+        fieldset { width: 400px; margin: 20px auto; padding: 20px; }
+        h2 { text-align: center; font-family: sans-serif; }
+        table { border-collapse: collapse; margin: 0 auto; }
+        td { border: 1px solid #000; padding: 5px; }
+        input { width: 100%; border: none; outline: none; }
+        .buttons { display: flex; gap: 5px; }
+    </style>
+</head>
+<body>
+
+    <h2>DOM in JAVASCRIPT</h2>
+
+    <fieldset>
+        <legend>DOM</legend>
+        <table>
+            <tr>
+                <td>Number 1</td>
+                <td><input type="number" id="n1" value="0"></td>
+            </tr>
+            <tr>
+                <td>Number 2</td>
+                <td><input type="number" id="n2" value="0"></td>
+            </tr>
+            <tr>
+                <td>Result</td>
+                <td><input type="text" id="res" readonly></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td class="buttons">
+                    <button onclick="calc('add')">ADD</button>
+                    <button onclick="calc('sub')">SUB</button>
+                    <button onclick="calc('mul')">MUL</button>
+                    <button onclick="calc('div')">DIV</button>
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+
+    <script>
+        function calc(op) {
+            // Get values from input fields
+            const num1 = parseFloat(document.getElementById('n1').value);
+            const num2 = parseFloat(document.getElementById('n2').value);
+            let result = 0;
+
+            // Perform operation based on button clicked
+            if (op === 'add') result = num1 + num2;
+            if (op === 'sub') result = num1 - num2;
+            if (op === 'mul') result = num1 * num2;
+            if (op === 'div') result = num1 / num2;
+
+            // Display result in the DOM
+            document.getElementById('res').value = result;
+        }
+    </script>
+
+</body>
+</html>

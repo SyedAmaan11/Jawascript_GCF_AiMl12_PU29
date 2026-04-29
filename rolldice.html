@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Interactive Dice</title>
+    <style>
+        :root {
+            --dice-size: 100px;
+            --dice-color: rgba(255, 255, 255, 0.9);
+            --dot-color: #333;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3a8a, #9333ea);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* 3D Scene */
+        .scene {
+            width: var(--dice-size);
+            height: var(--dice-size);
+            perspective: 600px;
+            margin-bottom: 50px;
+        }
+
+        /* Dice Cube */
+        .dice {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1.5s cubic-bezier(0.17, 0.67, 0.83, 1.3);
+        }
+
+        .face {
+            position: absolute;
+            width: var(--dice-size);
+            height: var(--dice-size);
+            background: var(--dice-color);
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            display: grid;
+            grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* Dot Styling */
+        .dot {
+            width: 18px;
+            height: 18px;
+            background: var(--dot-color);
+            border-radius: 50%;
+            align-self: center;
+            justify-self: center;
+        }
+
+        /* Positioning Faces in 3D Space */
+        .face-1 { transform: rotateY(0deg) translateZ(50px); }
+        .face-2 { transform: rotateY(180deg) translateZ(50px); }
+        .face-3 { transform: rotateY(90deg) translateZ(50px); }
+        .face-4 { transform: rotateY(-90deg) translateZ(50px); }
+        .face-5 { transform: rotateX(90deg) translateZ(50px); }
+        .face-6 { transform: rotateX(-90deg) translateZ(50px); }
+
+        /* Specific Dot Placements */
+        .face-1 .dot { grid-area: 2 / 2; }
+        .face-2 .dot:nth-child(1) { grid-area: 1 / 1; } .face-2 .dot:nth-child(2) { grid-area: 3 / 3; }
+        .face-3 .dot:nth-child(1) { grid-area: 1 / 1; } .face-3 .dot:nth-child(2) { grid-area: 2 / 2; } .face-3 .dot:nth-child(3) { grid-area: 3 / 3; }
+        /* (Grid mapping for 4, 5, 6 follows similar logic) */
+        .face-4 .dot:nth-child(1) { grid-area: 1 / 1; } .face-4 .dot:nth-child(2) { grid-area: 1 / 3; } .face-4 .dot:nth-child(3) { grid-area: 3 / 1; } .face-4 .dot:nth-child(4) { grid-area: 3 / 3; }
+        .face-5 .dot:nth-child(1) { grid-area: 1 / 1; } .face-5 .dot:nth-child(2) { grid-area: 1 / 3; } .face-5 .dot:nth-child(3) { grid-area: 2 / 2; } .face-5 .dot:nth-child(4) { grid-area: 3 / 1; } .face-5 .dot:nth-child(5) { grid-area: 3 / 3; }
+        .face-6 .dot:nth-child(1) { grid-area: 1 / 1; } .face-6 .dot:nth-child(2) { grid-area: 2 / 1; } .face-6 .dot:nth-child(3) { grid-area: 3 / 1; } .face-6 .dot:nth-child(4) { grid-area: 1 / 3; } .face-6 .dot:nth-child(5) { grid-area: 2 / 3; } .face-6 .dot:nth-child(6) { grid-area: 3 / 3; }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: white;
+            color: #1e3a8a;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: 0.2s;
+        }
+
+        button:active { transform: scale(0.95); }
+
+        #status { margin-top: 20px; font-size: 1.5rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="scene">
+        <div class="dice" id="dice">
+            <div class="face face-1"><div class="dot"></div></div>
+            <div class="face face-2"><div class="dot"></div><div class="dot"></div></div>
+            <div class="face face-3"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="face face-4"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="face face-5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="face face-6"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+    </div>
+
+    <button onclick="rollDice()">ROLL DICE</button>
+    <div id="status">Result: ?</div>
+
+    <script>
+        function rollDice() {
+            const dice = document.getElementById('dice');
+            const status = document.getElementById('status');
+            
+            // Generate a random number 1-6
+            const result = Math.floor(Math.random() * 6) + 1;
+
+            // Define rotations for each face
+            const rotations = {
+                1: 'rotateY(0deg) rotateX(0deg)',
+                2: 'rotateY(180deg) rotateX(0deg)',
+                3: 'rotateY(-90deg) rotateX(0deg)',
+                4: 'rotateY(90deg) rotateX(0deg)',
+                5: 'rotateX(-90deg) rotateY(0deg)',
+                6: 'rotateX(90deg) rotateY(0deg)'
+            };
+
+            // Add extra spins for visual effect
+            const extraSpins = ` rotateX(${Math.floor(Math.random() * 4) * 360}deg) rotateY(${Math.floor(Math.random() * 4) * 360}deg)`;
+            
+            dice.style.transform = rotations[result] + extraSpins;
+
+            status.innerText = "Rolling...";
+            
+            setTimeout(() => {
+                status.innerText = "Result: " + result + (result % 2 === 0 ? " (Even)" : " (Odd)");
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

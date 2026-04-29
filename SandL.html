@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake & Ladders Royale</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --board-size: 400px;
+            --cell-size: 40px;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* The Board Layout */
+        #board {
+            width: var(--board-size);
+            height: var(--board-size);
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            border: 4px solid #fff;
+            position: relative;
+        }
+
+        .cell {
+            width: var(--cell-size);
+            height: var(--cell-size);
+            border: 0.1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        /* Zig-zag coloring */
+        .cell:nth-child(even) { background: #16213e; }
+        .cell:nth-child(odd) { background: #0f3460; }
+
+        /* The Player Token */
+        #player {
+            width: 25px;
+            height: 25px;
+            background: #e94560;
+            border-radius: 50%;
+            position: absolute;
+            transition: all 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 10;
+            box-shadow: 0 0 15px #e94560;
+            border: 2px solid white;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        button {
+            padding: 15px 30px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        button:hover { background: #ff5e78; }
+        button:disabled { background: #555; }
+
+        #dice-res { font-size: 3rem; font-weight: bold; }
+        #status { color: #4ade80; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>Snake & Ladders</h1>
+
+    <div class="game-container">
+        <div id="board">
+            <div id="player"></div>
+            </div>
+
+        <div class="controls">
+            <div id="dice-res">⚀</div>
+            <button id="rollBtn" onclick="playTurn()">ROLL DICE</button>
+            <div id="status">Start Playing!</div>
+            <p>Target: Cell 100</p>
+        </div>
+    </div>
+
+<script>
+    const board = document.getElementById('board');
+    const player = document.getElementById('player');
+    const status = document.getElementById('status');
+    let playerPos = 1;
+
+    // Define Snakes and Ladders
+    // Key = Start, Value = End
+    const specialCells = {
+        3: 22, 5: 8, 11: 26, 20: 29, // Ladders
+        27: 1, 21: 9, 17: 4, 19: 7   // Snakes (Simulated for small board)
+    };
+    // Let's add more for a full 100 board
+    const jumps = {
+        4: 25, 13: 46, 33: 49, 42: 63, 50: 69, 62: 81, 74: 92, // Ladders
+        27: 5, 40: 3, 43: 18, 54: 31, 66: 45, 89: 53, 99: 41   // Snakes
+    };
+
+    // 1. Generate the Board UI (100 to 1)
+    for (let i = 100; i >= 1; i--) {
+        let cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.id = 'cell-' + i;
+        cell.innerText = i;
+        board.appendChild(cell);
+    }
+
+    function updatePlayerUI() {
+        const targetCell = document.getElementById('cell-' + playerPos);
+        const boardRect = board.getBoundingClientRect();
+        const cellRect = targetCell.getBoundingClientRect();
+
+        // Calculate relative position
+        player.style.left = (cellRect.left - boardRect.left + 7) + 'px';
+        player.style.top = (cellRect.top - boardRect.top + 7) + 'px';
+    }
+
+    function playTurn() {
+        const roll = Math.floor(Math.random() * 6) + 1;
+        const diceIcons = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+        document.getElementById('dice-res').innerText = diceIcons[roll - 1];
+
+        if (playerPos + roll <= 100) {
+            playerPos += roll;
+            status.innerText = `Moved to ${playerPos}`;
+        } else {
+            status.innerText = "Too high! Need exact roll.";
+        }
+
+        updatePlayerUI();
+
+        // Check for Snakes or Ladders
+        setTimeout(() => {
+            if (jumps[playerPos]) {
+                const isLadder = jumps[playerPos] > playerPos;
+                status.innerText = isLadder ? "LADDER! 🪜" : "SNAKE! 🐍";
+                playerPos = jumps[playerPos];
+                updatePlayerUI();
+            }
+
+            if (playerPos === 100) {
+                status.innerText = "🎉 YOU WIN! 🎉";
+                document.getElementById('rollBtn').disabled = true;
+            }
+        }, 600);
+    }
+
+    // Initialize position
+    updatePlayerUI();
+</script>
+
+</body>
+</html>
