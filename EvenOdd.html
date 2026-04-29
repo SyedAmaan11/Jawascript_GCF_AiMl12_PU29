@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Even/Odd Generator</title>
+    <style>
+        /* CSS Variables for easy color changes */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent: #ffffff;
+            --even-glow: 0 0 20px #4ade80;
+            --odd-glow: 0 0 20px #fbbf24;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--primary-gradient);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        /* Glassmorphism Card Effect */
+        .app-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            width: 350px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        h2 { font-weight: 600; margin-bottom: 20px; letter-spacing: 1px; }
+
+        .input-wrapper { margin-bottom: 25px; }
+
+        input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            font-size: 1.2rem;
+            outline: none;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(255,255,255,0.2);
+        }
+
+        .actions { display: flex; gap: 10px; }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: var(--accent);
+            color: #764ba2;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:active { transform: scale(0.95); }
+
+        #displayResult {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+
+        /* Result States */
+        .show { opacity: 1 !important; transform: translateY(0) !important; }
+        .even-result { text-shadow: var(--even-glow); color: #4ade80; border: 1px solid #4ade80; }
+        .odd-result { text-shadow: var(--odd-glow); color: #fbbf24; border: 1px solid #fbbf24; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <h2>ANALYZER</h2>
+    
+    <div class="input-wrapper">
+        <input type="number" id="userInput" placeholder="00">
+    </div>
+
+    <div class="actions">
+        <button onclick="generate()">RANDOM</button>
+        <button onclick="analyze()">CHECK</button>
+    </div>
+
+    <div id="displayResult">---</div>
+</div>
+
+<script>
+    function generate() {
+        const rand = Math.floor(Math.random() * 1000);
+        document.getElementById('userInput').value = rand;
+        analyze();
+    }
+
+    function analyze() {
+        const input = document.getElementById('userInput');
+        const res = document.getElementById('displayResult');
+        const val = parseInt(input.value);
+
+        res.classList.remove('show', 'even-result', 'odd-result');
+
+        // Small delay to trigger the animation again
+        setTimeout(() => {
+            if (isNaN(val)) {
+                res.innerText = "INVALID";
+                res.style.color = "#ff4d4d";
+            } else if (val % 2 === 0) {
+                res.innerText = val + " • EVEN";
+                res.classList.add('even-result');
+            } else {
+                res.innerText = val + " • ODD";
+                res.classList.add('odd-result');
+            }
+            res.classList.add('show');
+        }, 50);
+    }
+</script>
+
+</body>
+</html>

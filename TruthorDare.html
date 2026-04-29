@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truth or Dare Royale</title>
+    <style>
+        :root {
+            --primary: #ff0055;
+            --secondary: #00d4ff;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f0c29;
+            background: linear-gradient(to bottom, #24243e, #302b63, #0f0c29);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        /* The Spinning Bottle/Arrow */
+        .spinner-area {
+            position: relative;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .bottle {
+            width: 40px;
+            height: 150px;
+            background: var(--primary);
+            border-radius: 20px;
+            position: relative;
+            transition: transform 3s cubic-bezier(0.15, 0, 0.15, 1);
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        .bottle::before { /* Bottle Neck */
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 5px;
+        }
+
+        /* Result Display */
+        #display-type {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        #display-prompt {
+            font-size: 1.1rem;
+            font-style: italic;
+            min-height: 60px;
+            color: #ccc;
+        }
+
+        button {
+            background: white;
+            color: #0f0c29;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--secondary);
+        }
+
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .truth-theme { color: var(--secondary); text-shadow: 0 0 10px var(--secondary); }
+        .dare-theme { color: var(--primary); text-shadow: 0 0 10px var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="spinner-area">
+            <div class="bottle" id="bottle"></div>
+        </div>
+
+        <div id="display-type">Ready?</div>
+        <div id="display-prompt">Click the button to spin the bottle!</div>
+
+        <button id="spinBtn" onclick="play()">SPIN THE BOTTLE</button>
+    </div>
+
+    <script>
+        const truths = [
+            "What is your biggest fear?",
+            "What is the most embarrassing thing you've ever done?",
+            "Who is your secret crush?",
+            "What is a secret you've never told anyone?",
+            "Have you ever lied to get out of trouble?"
+        ];
+
+        const dares = [
+            "Do 20 pushups right now.",
+            "Sing the chorus of your favorite song loudly.",
+            "Let someone else send a text to anyone in your contacts.",
+            "Talk in an accent for the next 3 rounds.",
+            "Dance with no music for 1 minute."
+        ];
+
+        let currentRotation = 0;
+
+        function play() {
+            const bottle = document.getElementById('bottle');
+            const typeText = document.getElementById('display-type');
+            const promptText = document.getElementById('display-prompt');
+            const btn = document.getElementById('spinBtn');
+
+            // Disable button during spin
+            btn.disabled = true;
+            
+            // Randomly decide Truth (Even) or Dare (Odd) logic
+            const isTruth = Math.random() > 0.5;
+            
+            // Calculate random spin (at least 5 full rotations + offset)
+            const extraDegrees = isTruth ? 0 : 180; // 0deg for top, 180deg for bottom
+            const spins = (Math.floor(Math.random() * 5) + 5) * 360;
+            currentRotation += spins + extraDegrees + (Math.random() * 30 - 15); // Add slight randomness
+
+            bottle.style.transform = `rotate(${currentRotation}deg)`;
+
+            // Wait for animation to finish
+            setTimeout(() => {
+                btn.disabled = false;
+                
+                if (isTruth) {
+                    typeText.innerText = "TRUTH";
+                    typeText.className = "truth-theme";
+                    promptText.innerText = truths[Math.floor(Math.random() * truths.length)];
+                } else {
+                    typeText.innerText = "DARE";
+                    typeText.className = "dare-theme";
+                    promptText.innerText = dares[Math.floor(Math.random() * dares.length)];
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
